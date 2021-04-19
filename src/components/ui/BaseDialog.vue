@@ -2,7 +2,7 @@
   <teleport to="body">
     <div v-if="show" @click="tryClose" class="backdrop"></div>
     <transition name="dialog">
-      <dialog open v-if="show">
+      <dialog open v-if="show" @click.self="tryClose">
         <header>
           <slot name="header">
             <h2>{{ title }}</h2>
@@ -55,7 +55,7 @@ export default {
 
 dialog {
   position: fixed;
-  top: 20vh;
+  top: 15vh;
   left: 10%;
   width: 80%;
   z-index: 100;
