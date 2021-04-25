@@ -130,7 +130,6 @@ export default {
             return
         }
         const registeredData={
-            id:this.$store.getters['coaches/coaches'].length+1,
             firstName:this.inputValues.firstName.val,
             lastName:this.inputValues.lastName.val,
             description:this.inputValues.description.val,

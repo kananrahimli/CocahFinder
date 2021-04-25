@@ -1,5 +1,12 @@
 <template>
   <section>
+    <base-dialog
+      @close="closeDialog"
+      :show="!!error"
+      title="Registration is failed!!"
+      >{{ error }}</base-dialog
+    >
+    <base-spinner v-if="isLoading"></base-spinner>
     <form action="" @submit.prevent="submitForm">
       <div class="form-control" :class="{ errors: !inputValues.email.isValid }">
         <label for="email">Email</label>
@@ -34,6 +41,8 @@
 export default {
   data() {
     return {
+      isLoading: false,
+      error: null,
       inputValues: {
         email: {
           val: "",
@@ -65,24 +74,31 @@ export default {
         this.inputIsValid = false;
       }
     },
-    submitForm() {
+   async submitForm() {
       this.formValidate();
       if (!this.inputIsValid) {
         return;
       }
 
       let sendedRequest = {
-        id: new Date().toISOString(),
         coachId: this.$route.params.id,
         message: this.inputValues.message.val,
         email: this.inputValues.email.val,
       };
-
-      this.$store.dispatch("requests/contactCoach", sendedRequest);
-
-      console.log(this.$store.getters["requests/requests"]);
-
+  
+      this.isLoading=true
+     try {
+      await this.$store.dispatch("requests/contactCoach", sendedRequest);
       this.$router.go(-1);
+     } catch (error) {
+       this.error=error.message
+     } 
+     this.isLoading=false
+
+      
+    },
+    closeDialog() {
+      this.error = null;
     },
   },
 };

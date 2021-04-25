@@ -4,14 +4,27 @@
       <h1><router-link to="/">Coach Finder</router-link></h1>
       <ul>
         <li><router-link to="/coaches">Coaches</router-link></li>
-        <li><router-link to="/requests">Requests</router-link></li>
+        <li><router-link to="/requests" v-if="isLogged">Requests</router-link></li>
+        <li><router-link to="/auth" v-if="!isLogged">Login</router-link></li>
+        <li><router-link to="/auth" v-if="isLogged" @click="logOut">LogOut</router-link></li>
       </ul>
     </nav>
   </header>
 </template>
 
 <script>
-export default {};
+export default {
+  computed:{
+    isLogged(){
+      return this.$store.getters.isLogged
+    }
+  },
+  methods:{
+    logOut(){
+      this.$store.dispatch('logOut')
+    }
+  }
+};
 </script>
 
 <style scoped>

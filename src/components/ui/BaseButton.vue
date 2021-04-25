@@ -1,6 +1,6 @@
 <template>
   <div class="controls">
-    <button v-if="!link" :class="mode">
+    <button v-if="!link" :class="mode" :type="type">
       <slot></slot>
     </button>
     <router-link v-if="link" :to="to" :class="mode">
@@ -27,6 +27,10 @@ export default {
       required: false,
       default: null,
     },
+    type:{
+      type:String,
+      required:false
+    }
   },
 };
 </script>

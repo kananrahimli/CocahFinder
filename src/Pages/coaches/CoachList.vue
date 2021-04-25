@@ -13,8 +13,9 @@
     <base-card>
       <section>
         <div class="controls">
-          <base-button mode="outline" @click="refresh">Refresh</base-button>
-          <base-button link to="/register">Registration</base-button>
+          <base-button mode="outline" @click="refresh(true)" >Refresh</base-button>
+          <base-button link to="/auth?redirect=register" v-if="!isLogged">Login to Register as coach</base-button>
+          <base-button v-if="!isCoach && isLogged" link to="/register">Registration</base-button>
         </div>
         <base-spinner v-if="isLoading"></base-spinner>
         <ul v-else-if="hasCoach && !isLoading">
@@ -56,11 +57,9 @@ export default {
     };
   },
   computed: {
-    // ...mapGetters({
-    //   filterCoaches: ["coaches/coaches"],
-    //   hasCoaches: ["coaches/hasCoaches"],
-    // }),
-
+    isLogged(){
+      return this.$store.getters.isLogged
+    },
     filteredCoaches() {
       const filterCoaches = this.$store.getters["coaches/coaches"];
       return filterCoaches.filter((coach) => {
@@ -79,15 +78,20 @@ export default {
     hasCoach() {
       return this.$store.getters["coaches/hasCoaches"];
     },
+    isCoach(){
+      return this.$store.getters['coaches/isCoach']
+    }
   },
   methods: {
     setFilter(values) {
       this.values = values;
     },
-    async refresh() {
+    async refresh(refresh=false) {
       this.isLoading = true;
       try {
-        await this.$store.dispatch("coaches/loadCoaches");
+        await this.$store.dispatch("coaches/loadCoaches",{
+          forceRefresh:refresh
+        });
       } catch (error) {
         this.error =error.message;
       }

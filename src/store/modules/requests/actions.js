@@ -1,25 +1,31 @@
 export default {
   async contactCoach(context, data) {
-    const userId = context.rootGetters.userId;
-    await fetch(
-      `https://request-20e5d-default-rtdb.firebaseio.com/requests/${userId}.json`,
+    // const userId = context.rootGetters.userId;
+    const idToken= context.rootGetters.idToken;
+   const response= await fetch(
+      `https://fir-vue-file-default-rtdb.firebaseio.com/requests/${data.coachId}.json?auth=${idToken}`,
       {
         method: "POST",
         body: JSON.stringify(data),
       }
     );
+    const responseData=response.json();
+    if(response.status==401){
+      const error=new Error(responseData.message||'Before you have to login')
+      throw error;
+    }
     context.commit("sendRequest", data);
   },
 
   async getRequests(context) {
     const userId = context.rootGetters.userId;
     const response = await fetch(
-      `https://request-20e5d-default-rtdb.firebaseio.com/requests/${userId}.json`
+      `https://fir-vue-file-default-rtdb.firebaseio.com/requests/${userId}.json`
     );
     const responseData = await response.json();
 
     if (!response.ok) {
-      const error=new Error(response.status )
+      const error=new Error(response.status || 'Error:')
       throw error;
     }
     const requests = [];

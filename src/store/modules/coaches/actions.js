@@ -1,26 +1,48 @@
 export default {
   async registerCoach(context, data) {
     const userId = context.rootGetters.userId;
-    await fetch(
-      `https://fir-vue-file-default-rtdb.firebaseio.com/coaches/${userId}.json`,
+    const idToken=context.rootGetters.idToken
+    const coachData = {
+      id:userId,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      description: data.description,
+      hourlyRate: data.hourlyRate,
+      role: data.role
+    };
+    const response=await fetch(
+      `https://fir-vue-file-default-rtdb.firebaseio.com/coaches.json?auth=`+idToken,
       {
         method: "POST",
-        body: JSON.stringify(data),
+        body: JSON.stringify(coachData),
       }
     );
-    // context.commit("registerCoach", data);
+    const responseData=response.json()
+    if(response.status==401){
+      const error=new Error(responseData.message || "Before you have to Login")
+      throw error;
+    }
+    // context.commit("registerCoach", {
+    //   ...coachData,
+    //   id:userId
+    // });
   },
-  async loadCoaches(context) {
+  async loadCoaches(context,payload) {
+    if (!payload.forceRefresh && !context.getters.shouldUpdate) {
+      return;
+    }
     let coaches = [];
-    const userId = context.rootGetters.userId;
+    // const userId = context.rootGetters.userId;
     const response = await fetch(
-      `https://fir-vue-file-default-rtdb.firebaseio.com/coaches/${userId}.json`
+      `https://fir-vue-file-default-rtdb.firebaseio.com/coaches.json`
     );
     const responseData = await response.json();
 
     if (!response.ok) {
+      console.log(responseData)
       const error = new Error(response.status );
       throw error;
+      
     }
 
     for (const key in responseData) {
@@ -34,6 +56,7 @@ export default {
       };
       coaches.push(coach);
     }
-    context.commit("loadCoaches", coaches);
+    context.commit("loadCoaches", coaches)
+    context.commit('setFetchTimestamp');
   },
 };
